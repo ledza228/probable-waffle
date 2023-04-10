@@ -1,5 +1,5 @@
-const userDB = require('../models/user')
 const bcrypt = require('bcrypt')
+const {userDB} = require("../models/user");
 
 
 module.exports = {

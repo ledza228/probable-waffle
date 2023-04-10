@@ -18,15 +18,6 @@ const upload = multer({
     }}).single('file')
 
 
-router.get('/api/posts', async (req, res) => {
-    let page = req.query.page
-
-    const posts = await service.getAllPosts(page)
-    console.log(posts)
-    res.json(posts)
-})
-
-
 router.post('/api/add', jwt.resolveJWT ,(req, res) => {
     upload(req, res, function (err) {
         if (err) {

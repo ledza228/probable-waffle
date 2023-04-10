@@ -22,6 +22,22 @@ function resolveJWT(req, res, next){
 
 }
 
+/**
+ * '' if no user, username otherwise
+ */
+function getUserByJWT(req){
+    let token = req.cookies['token']
+    if(!token)
+        return ''
+
+    jwt.verify(token, secret_token, (err, decoded)=>{
+        if (err) {
+            return ''
+        }
+        return decoded['data']
+    })
+}
+
 function generateJWT(user){
     let token = jwt.sign({
         data: user
@@ -32,4 +48,5 @@ function generateJWT(user){
 module.exports = {
     resolveJWT: resolveJWT,
     generateJWT: generateJWT,
+    getUserByJWT
 }

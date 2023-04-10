@@ -36,4 +36,8 @@ const userMutation = {
     userRemoveMany: UserTC.getResolver('removeMany'),
 };
 
-module.exports =  {userQuery, userMutation}
+module.exports = {
+    userQuery,
+    userMutation,
+    userDB: User
+}

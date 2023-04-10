@@ -3,7 +3,7 @@ const graphqlHTTP = require("express-graphql").graphqlHTTP;
 const routes = require('./routes/postRoute.js')
 const userRoutes = require('./routes/userRoute.js')
 const path = require('path')
-const { schemaComposer } = require('graphql-compose')
+const {schemaComposer} = require('graphql-compose')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
@@ -17,7 +17,7 @@ const port = 4000
 
 const app = express()
 app.use(cors({
-    origin : 'http://localhost:3000',
+    origin: 'http://localhost:3000',
     credentials: true
 }))
 app.use(cookieParser())
@@ -39,18 +39,20 @@ const root = {
 
 app.use(
     '/graphql',
-    graphqlHTTP({
-        schema: trueSchema,
-        rootValue: root,
-        graphiql: true,
-        context: (req) => {
+    graphqlHTTP(
+        (req, res) => {
             return {
-                req: req,
-            };
+                schema: trueSchema,
+                graphiql: true,
+                context: {
+                    req: req,
+                    res: res
+                }
+            }
         }
-    })
+    )
 );
 
-app.listen(port, "0.0.0.0",  ()=>{
+app.listen(port, "0.0.0.0", () => {
     console.log("Server started!")
-} );
+});

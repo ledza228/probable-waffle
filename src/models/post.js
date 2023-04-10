@@ -2,6 +2,7 @@ const {composeMongoose, composeWithMongoose} = require('graphql-compose-mongoose
 const {schemaComposer} = require('graphql-compose')
 
 const mongoose = require('mongoose')
+const {createPostMiddleware, deletePostMiddleware} = require("../middleware/graphMiddleware");
 const Schema = mongoose.Schema
 
 const fishPostSchema = new Schema({
@@ -23,30 +24,16 @@ const FishPost = mongoose.model("FishPost", fishPostSchema)
 const FishPostTC = composeWithMongoose(FishPost)
 
 const postQuery = {
-    fishPostById: FishPostTC.getResolver('findById'),
-    fishPostByIds: FishPostTC.getResolver('findByIds'),
-    fishPostOne: FishPostTC.getResolver('findOne'),
-    fishPostMany: FishPostTC.getResolver('findMany', [authMiddleware]),
-    fishPostCount: FishPostTC.getResolver('count'),
+    fishPostMany: FishPostTC.getResolver('findMany'),
 };
 
 const postMutation = {
-    fishPostCreateOne: FishPostTC.getResolver('createOne'),
-    fishPostCreateMany: FishPostTC.getResolver('createMany'),
-    fishPostUpdateById: FishPostTC.getResolver('updateById'),
-    fishPostUpdateOne: FishPostTC.getResolver('updateOne'),
-    fishPostUpdateMany: FishPostTC.getResolver('updateMany'),
-    fishPostRemoveById: FishPostTC.getResolver('removeById'),
-    fishPostRemoveOne: FishPostTC.getResolver('removeOne'),
-    fishPostRemoveMany: FishPostTC.getResolver('removeMany'),
-};
-
-async function authMiddleware(resolve, source, args, context, info) {
-    console.log("keks123")
-    // console.log(context.req.cookies)
-
-    // console.log(FishPostTC.getResolvers())
-    return resolve(source, args, context, info);
+    fishPostCreateOne: FishPostTC.getResolver('createOne', [createPostMiddleware]),
+    fishPostRemoveById: FishPostTC.getResolver('removeById', [deletePostMiddleware])
 }
 
-module.exports = {postQuery, postMutation}
+
+module.exports = {
+    postQuery, postMutation,
+    post: FishPost
+}
