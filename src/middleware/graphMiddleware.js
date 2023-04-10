@@ -3,22 +3,22 @@ const FishPost = require("../models/db/post");
 
 
 async function createPostMiddleware(resolve, source, args, context, info) {
-    const user = getUserOrThrow(context.req)
+    const user = getUserNameOrThrow(context.req)
 
 
-    if (!args.title)
+    if (!args.record.title)
         throw new Error("No title")
 
-    if (args.text)
+    if (args.record.text)
         throw new Error("No text")
 
-    args.author = user
+    args.record.author = user
 
     return resolve(source, args, context, info);
 }
 
 async function deletePostMiddleware(resolve, source, args, context, info) {
-    const user = getUserOrThrow(context.req)
+    const user = getUserNameOrThrow(context.req)
     const postId = args._id
     const post = await FishPost.findOne().where({_id: postId})
     if (!post)
@@ -33,9 +33,9 @@ async function deletePostMiddleware(resolve, source, args, context, info) {
     return resolve(source, args, context, info);
 }
 
-function getUserOrThrow(req){
+function getUserNameOrThrow(req){
 
-    const user = getUserByJWT(req)
+    const user = getUserByJWT(req).login
 
     if(!user)
         throw new Error("Not authenticated")

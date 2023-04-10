@@ -25,8 +25,7 @@ app.use(express.json());
 
 app.use('/api/user/', userRoutes)
 // app.use('/', routes)
-// console.log("dirdirdir: " + path.join(__dirname, '../uploads/'))
-// app.use('/uploads', express.static('../uploads/'))
+app.use('/uploads', express.static('../uploads/'))
 
 
 

@@ -67,11 +67,4 @@ module.exports = {
         }
         return publicUser
     },
-
-    deleteByLogin: async (login, currentUser) => {
-        if (currentUser.login !== login){
-            throw new Error("You can't delete not yourself!")
-        }
-        await userDB.deleteOne({login: login})
-    }
 }

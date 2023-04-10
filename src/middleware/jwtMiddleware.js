@@ -4,14 +4,14 @@ const jwt = require('jsonwebtoken')
 const secret_token = 'a20ccc68-b752-11ed-800f-a87eea81e863'
 
 
-function resolveJWT(req, res, next){
+function resolveJWT(req, res, next) {
     let token = req.cookies['token']
 
-    if (!token){
+    if (!token) {
         res.status(401).json({status: 'Not authenticated'})
     }
 
-    jwt.verify(token, secret_token, (err, decoded)=>{
+    jwt.verify(token, secret_token, (err, decoded) => {
         if (err) {
             console.log(err)
             res.status(401).send('Token error!')
@@ -25,23 +25,22 @@ function resolveJWT(req, res, next){
 /**
  * '' if no user, username otherwise
  */
-function getUserByJWT(req){
+function getUserByJWT(req) {
     let token = req.cookies['token']
-    if(!token)
+    if (!token)
         return ''
-
-    jwt.verify(token, secret_token, (err, decoded)=>{
-        if (err) {
-            return ''
-        }
+    try {
+        const decoded = jwt.verify(token, secret_token)
         return decoded['data']
-    })
+    } catch (e) {
+        return ''
+    }
 }
 
-function generateJWT(user){
+function generateJWT(user) {
     let token = jwt.sign({
         data: user
-    }, secret_token, { expiresIn: '10m' })
+    }, secret_token, {expiresIn: '10m'})
     return token
 }
 

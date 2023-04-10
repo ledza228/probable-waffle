@@ -2,7 +2,6 @@ const router = require('express').Router()
 const jwt = require('../middleware/jwtMiddleware')
 const service = require('../service/userService')
 
-const postService = require('../service/postService')
 
 /*
     POST {
