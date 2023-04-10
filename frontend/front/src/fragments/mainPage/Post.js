@@ -4,22 +4,22 @@ import {Link} from "react-router-dom";
 const api = require('../../api/api')
 
 
-async function deleteOnClick(posts, event, socket) {
+async function deleteOnClick(posts, event) {
     let postId = event.target.id
     console.log(postId)
-    socket.emit("DELETE_POST", {
-        'token': localStorage.getItem('token'),
-        'id': postId
-    })
+    // socket.emit("DELETE_POST", {
+    //     'token': localStorage.getItem('token'),
+    //     'id': postId
+    // })
 }
 
-function DeleteButton({currentUser, data, updateDataFun, socket}){
+function DeleteButton({currentUser, data, updateDataFun}){
     if (currentUser.login !== data.author){
         return
     }
     return <div>
         <button className='btn btn-danger' onClick={(e)=>{
-            deleteOnClick(null,e, socket)
+            deleteOnClick(null,e)
         }} id={data._id}>Delete</button>
     </div>
 }
@@ -34,7 +34,7 @@ function Photo({data}){
     }
 }
 
-function Post({data, currentUser, updateDataFun, socket}){
+function Post({data, currentUser, updateDataFun}){
     return (
         <div className='p-3 border border-2 mb-4'>
             <div className='border-bottom d-flex flex-column bd-highlight mb-3 pl-3 font-monospace'>
@@ -42,7 +42,7 @@ function Post({data, currentUser, updateDataFun, socket}){
                 <span className='p-1 bd-highlight fs-5'>
                     {data.title}
                 </span>
-                <DeleteButton currentUser={currentUser} data={data} updateDataFun={updateDataFun} socket={socket}/>
+                <DeleteButton currentUser={currentUser} data={data} updateDataFun={updateDataFun} />
                 </div>
                 <span className='p-1 bd-highlight text-black-50 fw-light'>
                     {'автор: '}

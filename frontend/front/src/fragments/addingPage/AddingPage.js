@@ -1,39 +1,79 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {gql} from "@apollo/client";
 
 const config = require('../../config/config.js')
 const api = require('../../api/api').api
-const fetch = require('fetch-retry')(global.fetch);
+
+const client = require('../../api/grapql').client
+
+// const fetch = require('fetch-retry')(global.fetch);
 
 
 var setErrorFunc
 var setSuccessFunc
 
-async function sendData(event, socket) {
+
+async function createFile(event){
+    return "231231312"
+}
+
+async function sendData(event, nav) {
     event.preventDefault()
 
     let body = {
         'title': event.target[0].value,
         'text': event.target[1].value,
-        'token': localStorage.getItem('token')
+        // 'token': localStorage.getItem('token')
     }
 
+    let file = await createFile(event)
 
-    if (event.target[2].files[0]) {
-        let reader = new FileReader()
-        reader.readAsDataURL(event.target[2]?.files[0])
+    if (file){
+        body.file = file
+    }
 
-        reader.onload = function () {
-            body.file = reader.result
-            socket.emit("ADD_POST", body)
-        };
-        reader.onerror = function (error) {
-            setErrorFunc('Error with image!')
-        };
+    client.mutate({
+        mutation: gql`
+    mutation CreateFishPost($title: String!, $text: String!, $file: String!) {
+      fishPostCreateOne(record: {
+        title: $title,
+        text: $text,
+        image: $file
+      }) {
+        record {
+          title
+          author
+        }
+      }
     }
-    else{
-        socket.emit("ADD_POST", body)
-    }
+  `, variables: body,
+    context: {
+        headers: {
+            'Authorization': localStorage.getItem('token'),
+        },
+    },
+    }).then((r) => {
+            nav('/')
+        })
+
+
+    // //
+    // // if (event.target[2].files[0]) {
+    // //     let reader = new FileReader()
+    // //     reader.readAsDataURL(event.target[2]?.files[0])
+    // //
+    // //     reader.onload = function () {
+    // //         body.file = reader.result
+    // //         // socket.emit("ADD_POST", body)
+    // //     };
+    // //     reader.onerror = function (error) {
+    // //         setErrorFunc('Error with image!')
+    // //     };
+    // }
+    // else{
+    //     // socket.emit("ADD_POST", body)
+    // }
 
     return false
 }
@@ -63,21 +103,11 @@ function SuccessAlert({success}){
     )
 }
 
-function AddingPage({socket}){
+function AddingPage(){
     const [error, setError] = useState([])
     const [success, setSuccess] = useState([])
 
     const nav = useNavigate()
-
-
-    socket.on("ADD_POST", msg => {
-        if (!msg.error){
-            nav('/')
-        }
-        else {
-            setError(msg.error)
-        }
-    })
 
     return (
         <div>
@@ -87,15 +117,11 @@ function AddingPage({socket}){
             <div>
                 <SuccessAlert success={success}/>
             </div>
-            <form className="pt-5" onSubmit={(e) => sendData(e, socket)} encType='multipart/form-data'>
+            <form className="pt-5" onSubmit={(e) => sendData(e, nav)} encType='multipart/form-data'>
                 <div className="mb-3 container">
                     <label htmlFor="title" className="form-label">Название</label>
                     <input type='text' className='form-control col-auto' name='title' id='title' placeholder='названиe поста'/>
                 </div>
-                {/*<div className="mb-3 container">*/}
-                {/*    <label className="form-label" htmlFor='name'>Имя</label>*/}
-                {/*    <input type='text' className='form-control' name='name' id='name' placeholder="не обязательно"/>*/}
-                {/*</div>*/}
                 <div className="mb-3 container">
                     <label className="form-label" htmlFor='text'>Текст</label>
                     <textarea className='form-control col-auto' rows='9' name='text' id='text'/>

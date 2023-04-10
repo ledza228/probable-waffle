@@ -3,8 +3,10 @@ import {useEffect, useState} from "react";
 import Post from "./Post";
 import * as config from "../../config/config";
 import AllElements from "./AllElements";
+import {gql} from "@apollo/client";
 
 const api = require('../../api/api')
+const client = require('../../api/grapql').client
 
 
 function GetCurrentPage(searchString) {
@@ -63,48 +65,55 @@ async function fetchElements(page) {
 }
 
 
-function MainPage({socket}) {
+function MainPage() {
     const [currPage, setCurrPage] = useState(GetCurrentPage(useLocation().search))
     const [data, setData] = useState([])
     const [currentUser, setCurrentUser] = useState('')
+    const [totalPages, setTotalPages] = useState('')
+
     let updateDataFun = function () {
-        socket.emit("GET_POSTS", {'page': currPage})
+        let limit = 5
+        let skip = limit * (currPage - 1)
+
+        client.query({
+            query: gql`
+                query {
+                     fishPostMany(limit: ${limit}, skip: ${skip}, sort: _ID_DESC) {
+                           text, _id, title, author, createdAt, image
+                     }
+                }`
+        })
+        .then((r) => {
+            setData(r.data.fishPostMany)
+        })
+
+        client.query({
+            query: gql`
+                query{fishPostCount}
+            `
+        })
+        .then((r) => {
+            setTotalPages(Math.ceil(r.data.fishPostCount / limit))
+        })
     }
 
     useEffect(() => {
         updateDataFun()
         let token = localStorage.getItem('token')
-        if (token){
-            socket.emit("VERIFY", {'token': localStorage.getItem('token')})
-        }
     }, [currPage])
 
-    socket.on("VERIFY", (msg) => {
-        if (!msg.error){
-            setCurrentUser(msg)
-        }
-    })
 
-    socket.on("GET_POSTS", (msg) => {
-        setData(msg)
-    })
-
-    socket.on("DELETE_POST", (msg) => {
-        if (!msg.error){
-            updateDataFun()
-        }
-    })
-
-    if (!data) {
+    if (!data || !totalPages) {
         return null
     }
+
     return (
         <div>
             <div className='container mt-5'>
                 <Link className='btn btn-primary' to={'/add'}>Написать про рыбалку</Link>
-                <AllElements updateDataFun={updateDataFun} data={data} currentUser={currentUser} socket={socket}/>
+                <AllElements updateDataFun={updateDataFun} data={data} currentUser={currentUser} />
             </div>
-            <Pagination totalPages={data['totalPages']} currPage={currPage} setCurrPage={setCurrPage}/>
+            <Pagination totalPages={totalPages} currPage={currPage} setCurrPage={setCurrPage}/>
         </div>
     )
 }

@@ -18,25 +18,15 @@ async function fuck(socket){
 
 function App() {
 
-    const [socket, setSocket] = useState()
-
-    useEffect(() => {
-        setSocket(io("ws://localhost:5000"))
-    }, [])
-
-    if (!socket){
-        return
-    }
-
     return (
         <div className="App">
-          <Header socket={socket}/>
+          <Header />
           <Routes>
-            <Route path="/" element={<MainPage socket={socket} />}/>
-            <Route path="/add" element={<AddingPage socket={socket} />}/>
-            <Route path="/register" element={<RegisterPage socket={socket}/>} />
-            <Route path="/login" element={<LoginPage socket={socket} />} />
-            <Route path="/user/:login" element={<UserPage socket={socket}/>} />
+            <Route path="/" element={<MainPage  />}/>
+            <Route path="/add" element={<AddingPage  />}/>
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage  />} />
+            <Route path="/user/:login" element={<UserPage />} />
             {/*<Route path="/logout" element={LogoutFragment()} />*/}
           </Routes>
         </div>
