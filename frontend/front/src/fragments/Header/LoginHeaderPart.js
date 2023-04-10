@@ -5,14 +5,14 @@ const config = require('../../config/config')
 
 const api = require('../../api/api').api
 
-function AuthReadyUser({user, nav, socket}){
+function AuthReadyUser({user, nav}){
     // console.log(user)
     return (
         <div className='d-flex flex-row'>
             <span className='navbar mx-0'>
                 <Link to={'/user/' + user.login}>{user.login}</Link>
             </span>
-            <a className='btn btn-outline-primary my-2 my-sm-0 mx-3' type='button' onClick={()=>logout(nav, socket)}>Logout</a>
+            <a className='btn btn-outline-primary my-2 my-sm-0 mx-3' type='button' onClick={()=>logout(nav)}>Logout</a>
         </div>
     )
 }
@@ -26,32 +26,38 @@ function AnonUser(){
     )
 }
 
-function logout(nav, socket){
+function logout(nav){
     localStorage.removeItem('token')
-    socket.emit("VERIFY", null)
+    //todo restart
 }
 
-function LoginHeaderPart({socket}){
+function LoginHeaderPart(){
     const [userData, setUserData] = useState('')
     const [error, setError] = useState('')
     const nav = useNavigate()
 
+    //todo add graphql
 
-    useEffect(async () =>{
-        socket.emit("VERIFY", {'token': localStorage.getItem('token')})
+    useEffect(() =>{
+
+        api.getCurrentUserInfo()
+            .then(r => {
+                setUserData(r)
+            })
+        // socket.emit("VERIFY", {'token': localStorage.getItem('token')})
 
     }, [])
 
-    socket.on("VERIFY", (msg) => {
-        if (!msg.error){
-            setUserData(msg)
-            setError('')
-        }
-        else {
-            setError(msg.error)
-            setUserData('')
-        }
-    })
+    // // socket.on("VERIFY", (msg) => {
+    // //     if (!msg.error){
+    // //         setUserData(msg)
+    // //         setError('')
+    // //     }
+    // //     else {
+    // //         setError(msg.error)
+    // //         setUserData('')
+    // //     }
+    // })
 
     if (!userData && !error){
         return
@@ -60,7 +66,7 @@ function LoginHeaderPart({socket}){
     if (error){
         return <AnonUser />
     }
-    return <AuthReadyUser user={userData} nav={nav} socket={socket}/>
+    return <AuthReadyUser user={userData} nav={nav} />
 }
 
 

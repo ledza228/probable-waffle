@@ -1,7 +1,7 @@
 import LoginHeaderPart from "./LoginHeaderPart";
 import {Link, useNavigate} from "react-router-dom";
 
-function Header({socket}){
+function Header(){
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -12,7 +12,7 @@ function Header({socket}){
                     <span>Fish Land</span>
                 </Link>
             </div>
-            <LoginHeaderPart socket={socket} />
+            <LoginHeaderPart />
         </nav>
     )
 }
