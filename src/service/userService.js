@@ -35,11 +35,6 @@ module.exports = {
     },
 
 
-    getAllUsers: async function () {
-        return userDB.find();
-    },
-
-
     login: async function(user) {
         user.login = user.login.trim()
 

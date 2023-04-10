@@ -36,6 +36,4 @@ const userMutation = {
     userRemoveMany: UserTC.getResolver('removeMany'),
 };
 
-// module.exports = graphqlSchema;
-
 module.exports =  {userQuery, userMutation}

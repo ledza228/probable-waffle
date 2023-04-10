@@ -42,7 +42,12 @@ app.use(
     graphqlHTTP({
         schema: trueSchema,
         rootValue: root,
-        graphiql: true
+        graphiql: true,
+        context: (req) => {
+            return {
+                req: req,
+            };
+        }
     })
 );
 

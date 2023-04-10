@@ -1,5 +1,5 @@
-const { composeMongoose, composeWithMongoose} = require('graphql-compose-mongoose')
-const { schemaComposer } = require('graphql-compose')
+const {composeMongoose, composeWithMongoose} = require('graphql-compose-mongoose')
+const {schemaComposer} = require('graphql-compose')
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
@@ -26,7 +26,7 @@ const postQuery = {
     fishPostById: FishPostTC.getResolver('findById'),
     fishPostByIds: FishPostTC.getResolver('findByIds'),
     fishPostOne: FishPostTC.getResolver('findOne'),
-    fishPostMany: FishPostTC.getResolver('findMany'),
+    fishPostMany: FishPostTC.getResolver('findMany', [authMiddleware]),
     fishPostCount: FishPostTC.getResolver('count'),
 };
 
@@ -41,8 +41,12 @@ const postMutation = {
     fishPostRemoveMany: FishPostTC.getResolver('removeMany'),
 };
 
-// const graphqlSchema = schemaComposer.buildSchema()
-//
-// module.exports = graphqlSchema
+async function authMiddleware(resolve, source, args, context, info) {
+    console.log("keks123")
+    console.log(context.req.cookies)
 
-module.exports =  {postQuery, postMutation}
+    // console.log(FishPostTC.getResolvers())
+    return resolve(source, args, context, info);
+}
+
+module.exports = {postQuery, postMutation}
