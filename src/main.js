@@ -9,6 +9,8 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const graphqlSchema = require("./models/post");
 
+const trueSchema = require("./models/schema");
+
 mongoose.connect("mongodb://root:root@localhost")
 
 const port = 4000
@@ -27,7 +29,6 @@ app.use(express.json());
 // console.log("dirdirdir: " + path.join(__dirname, '../uploads/'))
 // app.use('/uploads', express.static('../uploads/'))
 
-const schema = schemaComposer.buildSchema()
 
 const root = {
     hello: () => {
@@ -39,11 +40,12 @@ const root = {
 app.use(
     '/graphql',
     graphqlHTTP({
-        schema: schema,
+        schema: trueSchema,
         rootValue: root,
+        graphiql: true
     })
 );
 
-app.listen(port, ()=>{
+app.listen(port, "0.0.0.0",  ()=>{
     console.log("Server started!")
 } );
