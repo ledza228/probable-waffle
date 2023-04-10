@@ -5,18 +5,18 @@ const {userDB} = require("../models/user");
 module.exports = {
 
     addUser: async (user) => {
-        user.login = user.login.trim()
-        if (!user.login || user.login === ''){
+        if (!user.login || user.login.trim() === ''){
             throw new Error('There is no login')
         }
         if (!user.password || user.password === ''){
             throw new Error('There is no password')
         }
+        user.login = user.login.trim()
 
         let res = await userDB.find({}).where({'login': user.login})
         console.log(res)
         if (res.length !== 0){
-            throw new Error('Login is reserved!')
+            throw new Error('Login is used!')
         }
 
         let newUser = {
