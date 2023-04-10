@@ -1,4 +1,4 @@
-const { composeMongoose } = require('graphql-compose-mongoose')
+const { composeMongoose, composeWithMongoose} = require('graphql-compose-mongoose')
 const { schemaComposer } = require('graphql-compose')
 
 const mongoose = require('mongoose')
@@ -20,7 +20,7 @@ const fishPostSchema = new Schema({
 
 const FishPost = mongoose.model("FishPost", fishPostSchema)
 
-const FishPostTC = composeMongoose(FishPost)
+const FishPostTC = composeWithMongoose(FishPost)
 
 const postQuery = {
     fishPostById: FishPostTC.getResolver('findById'),
@@ -45,4 +45,4 @@ const postMutation = {
 //
 // module.exports = graphqlSchema
 
-export {postQuery, postMutation}
+module.exports =  {postQuery, postMutation}

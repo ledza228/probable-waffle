@@ -1,5 +1,5 @@
 const express = require('express');
-const graphqlHTTP = require("express-graphql");
+const graphqlHTTP = require("express-graphql").graphqlHTTP;
 const routes = require('./routes/postRoute.js')
 const userRoutes = require('./routes/userRoute.js')
 const path = require('path')

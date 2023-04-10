@@ -17,4 +17,4 @@ schemaComposer.Mutation.addFields({
 });
 
 
-export default schemaComposer.buildSchema()
+module.exports =  schemaComposer.buildSchema()

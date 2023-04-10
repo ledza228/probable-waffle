@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {composeMongoose} = require('graphql-compose-mongoose');
+const {composeMongoose, composeWithMongoose} = require('graphql-compose-mongoose');
 const {schemaComposer} = require('graphql-compose');
 
 const Schema = mongoose.Schema;
@@ -15,7 +15,7 @@ const User = mongoose.model('User', userSchema);
 
 const customizationOptions = {}; // no customization options provided
 
-const UserTC = composeMongoose(User, customizationOptions);
+const UserTC = composeWithMongoose(User, customizationOptions);
 
 const userQuery = {
     userById: UserTC.getResolver('findById'),
@@ -38,4 +38,4 @@ const userMutation = {
 
 // module.exports = graphqlSchema;
 
-export {userQuery, userMutation}
+module.exports =  {userQuery, userMutation}
