@@ -43,7 +43,7 @@ const postMutation = {
 
 async function authMiddleware(resolve, source, args, context, info) {
     console.log("keks123")
-    console.log(context.req.cookies)
+    // console.log(context.req.cookies)
 
     // console.log(FishPostTC.getResolvers())
     return resolve(source, args, context, info);
