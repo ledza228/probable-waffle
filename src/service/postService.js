@@ -1,4 +1,4 @@
-const {post} = require("../models/post");
+const post = require("../models/db/post");
 
 const count_on_page = 5;
 

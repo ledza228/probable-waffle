@@ -7,7 +7,6 @@ const {schemaComposer} = require('graphql-compose')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const graphqlSchema = require("./models/post");
 
 const trueSchema = require("./models/schema");
 
@@ -30,12 +29,6 @@ app.use(express.json());
 // app.use('/uploads', express.static('../uploads/'))
 
 
-const root = {
-    hello: () => {
-        return "Hello world!";
-    },
-    graphqlSchema
-}
 
 app.use(
     '/graphql',

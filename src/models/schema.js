@@ -1,6 +1,6 @@
 const SchemaComposer = require('graphql-compose').SchemaComposer
 const {userMutation, userQuery} = require('./user')
-const {postMutation, postQuery} = require('./post')
+const {postMutation, postQuery} = require('./graph/post')
 
 
 const schemaComposer = new SchemaComposer();
