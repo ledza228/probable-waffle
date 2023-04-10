@@ -1,6 +1,5 @@
-import {Link, useLocation, useParams, useSearchParams} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {useEffect, useState} from "react";
-import Post from "./Post";
 import * as config from "../../config/config";
 import AllElements from "./AllElements";
 import {gql} from "@apollo/client";
@@ -81,9 +80,11 @@ function MainPage() {
                      fishPostMany(limit: ${limit}, skip: ${skip}, sort: _ID_DESC) {
                            text, _id, title, author, createdAt, image
                      }
-                }`
+                }`,
+            fetchPolicy: "network-only"
         })
         .then((r) => {
+            console.log(r.data.fishPostMany)
             setData(r.data.fishPostMany)
         })
 
@@ -100,6 +101,8 @@ function MainPage() {
     useEffect(() => {
         updateDataFun()
         let token = localStorage.getItem('token')
+        api.api.getCurrentUserInfo()
+            .then(r => setCurrentUser(r))
     }, [currPage])
 
 

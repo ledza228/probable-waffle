@@ -1,16 +1,32 @@
-import {useState} from "react";
 import {Link} from "react-router-dom";
+import {client} from "../../api/grapql";
+import {gql} from "@apollo/client";
 
 const api = require('../../api/api')
 
 
-async function deleteOnClick(posts, event) {
+async function deleteOnClick(posts, event, updateDataFun) {
     let postId = event.target.id
     console.log(postId)
-    // socket.emit("DELETE_POST", {
-    //     'token': localStorage.getItem('token'),
-    //     'id': postId
-    // })
+
+    client.mutate({
+        mutation: gql`
+          mutation RemoveFishPost($_id: MongoID!) {
+              fishPostRemoveById(_id: $_id) {
+                recordId
+              }
+            }`, variables: {
+            _id: postId
+        },
+        context: {
+            headers: {
+                'Authorization': localStorage.getItem('token'),
+            },
+        },
+    })
+    .then((r) => {
+        updateDataFun()
+    })
 }
 
 function DeleteButton({currentUser, data, updateDataFun}){
@@ -19,14 +35,14 @@ function DeleteButton({currentUser, data, updateDataFun}){
     }
     return <div>
         <button className='btn btn-danger' onClick={(e)=>{
-            deleteOnClick(null,e)
+            deleteOnClick(null,e, updateDataFun)
         }} id={data._id}>Delete</button>
     </div>
 }
 
 function Photo({data}){
     console.log(data)
-    if (data['image'] !== undefined){
+    if (data['image'] !== null){
         let addr = 'http://localhost:4000'
         return (
             <img src={addr + data.image} width={400} alt={''}></img>

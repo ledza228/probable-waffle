@@ -26,7 +26,7 @@ function resolveJWT(req, res, next) {
  * '' if no user, username otherwise
  */
 function getUserByJWT(req) {
-    let token = req.cookies['token']
+    let token = req.headers['authorization']
     if (!token)
         return ''
     try {

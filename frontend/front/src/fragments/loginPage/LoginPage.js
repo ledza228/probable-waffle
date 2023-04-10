@@ -4,10 +4,12 @@ import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 const config = require('../../config/config')
 
+const api = require('../../api/api').api
+
 let setErrorFunc
 let setSuccessFunc
 
-function sendData(event, socket){
+function sendData(event){
     event.preventDefault()
 
     let body = {
@@ -15,47 +17,46 @@ function sendData(event, socket){
         'password': event.target[1].value
     }
 
-    socket.emit('LOGIN', body)
 
-    // fetch(config.urls.login_user_url, {
-    //     credentials: 'include',
-    //     body: JSON.stringify(body),
-    //     method: 'POST',
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    // }).then(async (r) => {
-    //     if (!r.ok){
-    //         setSuccessFunc('')
-    //         setErrorFunc((await r.json())['status'])
-    //         return
-    //     }
-    //     setErrorFunc('')
-    //     setSuccessFunc('Logged in')
-    //     localStorage.setItem('refresh_token', (await r.json())['refresh_token'])
-    //     window.location = '/'
-    // })
+    fetch(config.urls.login_user_url, {
+        credentials: 'include',
+        body: JSON.stringify(body),
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(async (r) => {
+        if (!r.ok){
+            setSuccessFunc('')
+            setErrorFunc((await r.json())['status'])
+            return
+        }
+        setErrorFunc('')
+        setSuccessFunc('Logged in')
+        localStorage.setItem('token', (await r.json())['token'])
+        window.location = '/'
+    })
 
     return false
 }
 
-function LoginPage({socket}){
+function LoginPage(){
 
     const nav = useNavigate()
 
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-    socket.on("LOGIN", (msg) => {
-        if (!msg.error){
-            localStorage.setItem('token', msg.token)
-            socket.emit('VERIFY', msg.token)
-            nav('/')
-        }
-        else {
-            setError(msg.error)
-        }
-    })
+    // socket.on("LOGIN", (msg) => {
+    //     if (!msg.error){
+    //         localStorage.setItem('token', msg.token)
+    //         socket.emit('VERIFY', msg.token)
+    //         nav('/')
+    //     }
+    //     else {
+    //         setError(msg.error)
+    //     }
+    // })
 
     setErrorFunc = setError
     setSuccessFunc = setSuccess
@@ -67,7 +68,7 @@ function LoginPage({socket}){
         <div>
             <SuccessAlert success={success}/>
         </div>
-        <form className="pt-5" onSubmit={(e) => sendData(e, socket)} encType='application/json'>
+        <form className="pt-5" onSubmit={(e) => sendData(e)} encType='application/json'>
             <div className="mb-3 container">
                 <label htmlFor="login" className="form-label">Login</label>
                 <input type='text' className='form-control col-auto' name='login' id='login' placeholder='Логин'/>

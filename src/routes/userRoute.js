@@ -16,10 +16,11 @@ router.post('/register', async (req, res) => {
     console.log(newUserData)
     service.addUser(newUserData)
         .then(async (r) => {
-            res.cookie('token', jwt.generateJWT(r), {
+            let token = jwt.generateJWT(r)
+            res.cookie('token', token, {
                 httpOnly: true,
             })
-            res.json({'status': 'OK'})
+            res.json({'status': 'OK', 'token':token})
         })
         .catch((err) => {
             res.status(400).json({'status': err.message})
@@ -33,7 +34,7 @@ router.post('/login', async (req, res) => {
         let token = jwt.generateJWT(publicUser)
 
         res.cookie('token', token, {httpOnly: true})
-        res.json({'status': 'OK'})
+        res.json({'status': 'OK', 'token': token})
     } catch (e) {
         res.status(400).json({'status': e.message})
     }

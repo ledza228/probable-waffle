@@ -2,7 +2,10 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Alert from "../notifications/Alert";
 import AllElements from "../mainPage/AllElements";
+import {gql} from "@apollo/client";
 const api = require('../../api/api')
+const client = require('../../api/grapql').client
+
 
 function Login({user}){
     let bio = ''
@@ -37,7 +40,7 @@ function ControlButtons({user, currentUser}){
     return <div></div>
 }
 
-function UserPage({socket}){
+function UserPage(){
     let {login} = useParams()
 
     const [userData, setUserData] = useState('')
@@ -47,41 +50,77 @@ function UserPage({socket}){
 
 
     let updatePosts = () => {
-        socket.emit("USER_POSTS", {'login': login})
+
+        client.query({
+            query: gql`
+              query GetPostsByAuthor($author: String!) {
+              fishPostMany(filter: { author: $author }, sort: _ID_DESC) {
+                _id
+                title
+                text
+                author
+                createdAt
+                image
+              }
+            }`,
+            variables: {
+                'author': login
+            },
+            fetchPolicy: "network-only"
+        }).then((r) => {
+                setPosts(r.data.fishPostMany)
+            })
+
+        client.query({
+            query: gql`
+               query GetPostsByAuthor($login: String!) {
+                userOne(filter: { login: $login }) {
+                _id
+                login
+                bio
+                image
+      }
+    }`,
+        variables: {
+            login: login
+        }})
+            .then((r) => {
+                setUserData(r.data.userOne)
+            })
     }
 
     useEffect(()=>{
-        socket.emit("VERIFY", {'token': localStorage.getItem('token')})
-        socket.emit("USER_BY_LOGIN", {'login': login})
+        api.api.getCurrentUserInfo().then((r) => setMe(r))
+
         updatePosts()
     },[])
 
-    socket.on("VERIFY", (msg) => {
-        if (!msg.error){
-            setMe(msg)
-        }
-    })
+    // socket.on("VERIFY", (msg) => {
+    //     if (!msg.error){
+    //         setMe(msg)
+    //     }
+    // })
+    //
+    // socket.on("USER_BY_LOGIN", (msg) => {
+    //     if (!msg.error){
+    //         setUserData(msg)
+    //     }
+    //     else {
+    //         setError(msg.error)
+    //     }
+    // })
+    //
+    // socket.on("USER_POSTS", (msg)=> {
+    //     if (!msg.error){
+    //         setPosts(msg)
+    //     }
+    // })
 
-    socket.on("USER_BY_LOGIN", (msg) => {
-        if (!msg.error){
-            setUserData(msg)
-        }
-        else {
-            setError(msg.error)
-        }
-    })
-
-    socket.on("USER_POSTS", (msg)=> {
-        if (!msg.error){
-            setPosts(msg)
-        }
-    })
-
-    socket.on("DELETE_POST", (msg) => {
-        if (!msg.error){
-            updatePosts()
-        }
-    })
+    // socket.on("DELETE_POST", (msg) => {
+    //     if (!msg.error){
+    //         updatePosts()
+    //     }
+    // })
 
 
     if (!userData && !error && !posts){
@@ -99,7 +138,7 @@ function UserPage({socket}){
             <div></div>
         </div>
         <ControlButtons currentUser={me} user={userData}/>
-        <AllElements data={posts} currentUser={me} socket={socket} />
+        <AllElements data={posts} currentUser={me} updateDataFun={updatePosts} />
     </div>
 
 }

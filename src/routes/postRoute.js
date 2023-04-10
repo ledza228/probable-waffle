@@ -6,7 +6,7 @@ const multer = require('multer')
 const trueType = ['image/jpeg', 'image/x-png', 'image/png', 'image/gif']
 
 const upload = multer({
-    dest: '../uploads/',
+    dest: './uploads/',
     fileSize: 1024 * 1024 * 10,
     fileFilter: (req,file,cb)=>{
         if (!trueType.includes(file.mimetype)){
@@ -17,5 +17,16 @@ const upload = multer({
     }}).single('file')
 
 
+
+router.post('/file', (req, res) => {
+    upload(req, res, function (err) {
+        if (err) {
+            res.status(400)
+            res.send(err.message)
+            return;
+        }
+        res.json({'file': req?.file?.filename})
+    })
+})
 
 module.exports = router;

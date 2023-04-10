@@ -8,6 +8,7 @@ const FishPostTC = composeWithMongoose(FishPost)
 
 const postQuery = {
     fishPostMany: FishPostTC.getResolver('findMany'),
+    fishPostCount: FishPostTC.getResolver('count'),
 };
 
 const postMutation = {

@@ -5,11 +5,10 @@ const FishPost = require("../models/db/post");
 async function createPostMiddleware(resolve, source, args, context, info) {
     const user = getUserNameOrThrow(context.req)
 
-
     if (!args.record.title)
         throw new Error("No title")
 
-    if (args.record.text)
+    if (!args.record.text)
         throw new Error("No text")
 
     args.record.author = user

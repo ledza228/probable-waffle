@@ -10,7 +10,7 @@ const config = require('../../config/config')
 let setErrorFunc;
 let setSuccessFunc;
 
-function sendData(event, socket){
+function sendData(event){
     event.preventDefault()
 
     let body = {
@@ -18,7 +18,6 @@ function sendData(event, socket){
         'password': event.target[1].value
     }
 
-    socket.emit("REGISTER", body)
     fetch(config.urls.register_user_url, {
         credentials: 'include',
 
@@ -35,7 +34,7 @@ function sendData(event, socket){
         }
         setErrorFunc('')
         setSuccessFunc('Created')
-        localStorage.setItem('refresh_token', (await r.json())['refresh_token'])
+        localStorage.setItem('token', (await r.json())['token'])
         // window.location = '/'
     })
 
@@ -43,7 +42,7 @@ function sendData(event, socket){
 }
 
 
-function RegisterPage({socket}){
+function RegisterPage(){
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
 
@@ -51,18 +50,6 @@ function RegisterPage({socket}){
 
     setErrorFunc = setError
     setSuccessFunc = setSuccess
-
-    socket.on("REGISTER", (msg) => {
-        if (!msg.error){
-            localStorage.setItem("token", msg.token)
-            socket.emit("VERIFY", {'token': msg.token})
-            nav('/')
-        }
-        else {
-            setError(msg.error)
-            setSuccess('')
-        }
-    })
 
     return (
         <div>
@@ -72,7 +59,7 @@ function RegisterPage({socket}){
             <div>
                 <SuccessAlert success={success}/>
             </div>
-            <form className="pt-5" onSubmit={(event)=>sendData(event, socket)} encType='application/json'>
+            <form className="pt-5" onSubmit={(event)=>sendData(event)} encType='application/json'>
                 <div className="mb-3 container">
                     <label htmlFor="login" className="form-label">Login</label>
                     <input type='text' className='form-control col-auto' name='login' id='login' placeholder='Логин'/>

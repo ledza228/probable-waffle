@@ -7,7 +7,6 @@ const api = require('../../api/api').api
 
 const client = require('../../api/grapql').client
 
-// const fetch = require('fetch-retry')(global.fetch);
 
 
 var setErrorFunc
@@ -15,10 +14,17 @@ var setSuccessFunc
 
 
 async function createFile(event){
-    return "231231312"
+    const formData  = new FormData();
+
+    formData.append(event.target[2].name, event.target[2].files[0])
+    console.log(event.target[2])
+    return (await fetch('http://localhost:4000/file', {
+        method: 'POST',
+        body: formData
+    })).json()
 }
 
-async function sendData(event, nav) {
+async function sendData(event, nav, setError) {
     event.preventDefault()
 
     let body = {
@@ -29,13 +35,14 @@ async function sendData(event, nav) {
 
     let file = await createFile(event)
 
-    if (file){
-        body.file = file
+    if (file?.file){
+        body.file = '/uploads/' + file.file
     }
+
 
     client.mutate({
         mutation: gql`
-    mutation CreateFishPost($title: String!, $text: String!, $file: String!) {
+    mutation CreateFishPost($title: String!, $text: String!, $file: String) {
       fishPostCreateOne(record: {
         title: $title,
         text: $text,
@@ -55,6 +62,9 @@ async function sendData(event, nav) {
     },
     }).then((r) => {
             nav('/')
+        })
+        .catch((r) => {
+            setError(r.message)
         })
 
 
@@ -84,7 +94,6 @@ function Alert({error}){
     if (error == ''){
         return
     }
-    setSuccessFunc('')
     return (
         <div className='alert alert-primary' role="alert">
             {error}
@@ -117,7 +126,7 @@ function AddingPage(){
             <div>
                 <SuccessAlert success={success}/>
             </div>
-            <form className="pt-5" onSubmit={(e) => sendData(e, nav)} encType='multipart/form-data'>
+            <form className="pt-5" onSubmit={(e) => sendData(e, nav, setError)} encType='multipart/form-data'>
                 <div className="mb-3 container">
                     <label htmlFor="title" className="form-label">Название</label>
                     <input type='text' className='form-control col-auto' name='title' id='title' placeholder='названиe поста'/>
